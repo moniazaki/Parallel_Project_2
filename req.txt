@@ -1,0 +1,20 @@
+Necessary libraries and instructions for activating a virtual environment.
+
+-Instructions to Set Up and Run the Environment
+
+-Open your terminal or command prompt and run:
+-Activate the Virtual Environment
+
+Windows:
+
+venv\Scripts\activate
+
+-Install Required Libraries
+-Run the following command:
+
+
+pip install  requests tkinter
+
+-Run the Application
+
+python main.py
