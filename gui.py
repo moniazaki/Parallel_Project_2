@@ -5,6 +5,8 @@ from downloader import FileDownloader
 
 class DownloaderGUI:
     def __init__(self):
+        #   Initializes the GUI with default values for settings like URLs,
+        #   destination folder, threads, and retry limit.
         self.root = Tk()
         self.root.title("Multi-Threaded Downloader")
         self.root.geometry("700x700")
@@ -13,17 +15,18 @@ class DownloaderGUI:
         self.threads = []
         self.thread_count = 1
         self.download_windows = []
-        self.retry_limit = 3  # Default retry limit
-        self.downloaders = {}  # Map Toplevel windows to downloader instances
+        self.retry_limit = 3  
+        self.downloaders = {}  
         self.setup_ui()
 
     def setup_ui(self):
+        #  Sets up the user interface with labels, buttons, and input fields.
         self.root.configure(bg="white")
 
         Label(self.root, text="Multi-Threaded Downloader", font=("Arial", 16), bg="white", fg="black").pack(pady=10)
 
         Label(self.root, text="Enter URLs (one per line):", bg="white", fg="black").pack()
-        self.text_box = Text(self.root, height=10, width=50, bg="#FFE4E1", fg="black")  # Light pink background
+        self.text_box = Text(self.root, height=10, width=50, bg="#FFE4E1", fg="black")  
         self.text_box.pack(pady=10)
 
         Label(self.root, text="Select Destination Folder:", bg="white", fg="black").pack()
@@ -42,19 +45,23 @@ class DownloaderGUI:
         Button(self.root, text="Start Download", command=self.start_download, bg="#008080", fg="white").pack(pady=10)  # Teal button
 
     def browse_folder(self):
+        #  Opens a folder dialog for the user to select the destination folder for downloads.
         folder = filedialog.askdirectory()
         if folder:
             self.dest_folder = folder
             self.folder_label.config(text=folder)
 
     def update_thread_count(self):
+        #  Updates the number of threads for parallel downloads based on user input.
         self.thread_count = int(self.thread_selector.get())
 
     def update_retry_limit(self):
+        # Updates the retry limit for failed downloads based on user input.
         self.retry_limit = int(self.retry_limit_selector.get())
 
     def start_download(self):
-        urls = self.text_box.get("1.0", "end-1c").splitlines()
+        #  Starts the download process. Initializes downloaders and manages threads for each download.
+        urls = self.text_box.get("1.0", "end-1c").splitlines() # Get list of URLs
         if not urls:
             self.show_error("No URLs provided.")
             return
@@ -88,7 +95,7 @@ class DownloaderGUI:
             cancel_button.pack(side="left", padx=5)
 
             downloader = FileDownloader(
-                urls[i::self.thread_count],  # Distribute URLs among threads
+                urls[i::self.thread_count],  
                 self.dest_folder,
                 lambda idx, prog, bar=progress_bar: self.update_progress(bar, prog),
                 lambda idx, err, log=log_box: self.log_error(log, err),
@@ -98,7 +105,7 @@ class DownloaderGUI:
             thread = threading.Thread(target=downloader.start_download)
             self.threads.append(thread)
             self.download_windows.append(download_window)
-            self.downloaders[download_window] = downloader  # Link window to downloader instance
+            self.downloaders[download_window] = downloader  
 
             thread.start()
 
@@ -116,21 +123,26 @@ class DownloaderGUI:
             self.download_windows.remove(download_window)
             download_window.destroy()
 
+    # Updates the progress bar of a specific download window.
     def update_progress(self, progress_bar, progress):
         progress_bar["value"] = progress
 
+    #  Logs errors for a specific download window.
     def log_error(self, log_box, error):
         log_box.config(state="normal")
         log_box.insert("end", error + "\n")
         log_box.config(state="disabled")
 
+    #  Displays an error message if required parameters (URLs or folder) are missing.
     def show_error(self, message):
         error_window = Toplevel(self.root)
         error_window.title("Error")
         error_window.configure(bg="white")
         Label(error_window, text=message, fg="red", bg="white").pack(pady=10)
         Button(error_window, text="OK", command=error_window.destroy, bg="#008080", fg="white").pack(pady=5)
-
+        
+    #  Starts the Tkinter main event loop.This method is responsible for running the GUI. 
+    # The mainloop() function keeps the Tkinter window open and allows for user interactions.
     def run(self):
         self.root.mainloop()
 
